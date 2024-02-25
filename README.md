@@ -1,5 +1,7 @@
 # Imag_Demo
 Rozwiązanie zadania. Po sklonowaniu można uruchomić za pomocą komendy docker compose up, lub bezpośrednio z IDE Visual Studio.
+Do poprawnego działania będzie potrzebny docker, pierwsze uruchomienie może chwilę potrwać.
+Można uruchomić za pomocą IIS ale będzie trzeba podać connectionstring dla bazy sql i baseuri dla zapytań api.
 Wszystkie zmienne środowiskowe są w pliku docker-compose.yml, domyślnie jest uruchamiany:
 
 -server SQL na porcie 1433
