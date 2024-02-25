@@ -1,0 +1,123 @@
+﻿@page "/Customers/CustomersView/"
+
+@using Imag.Demo.Shared;
+
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JsRuntime
+@inject IHttpClientFactory clientFactory
+
+
+@if (!finishedLoading) @*Check if data is loaded properly*@
+{
+    <LoadingSpinner />
+}
+@if (finishedLoading) @* logic check to not render page two times*@
+{
+    <table style="padding: 5px; text-align: center; border: 1px solid;">
+        <tr style="border: 2px solid;" >
+            <th style="padding: 5px; " ><button class="oi oi-sort-ascending" @onclick="viewOrderById">Id</button></th>
+            <th style="padding: 5px; " ><button class="oi oi-sort-ascending" @onclick="viewOrderByName">Nazwa</button></th>
+            <th style="padding: 5px; " ><button class="oi oi-sort-ascending" @onclick="viewOrderByAdress">Adres</button></th>
+                <th style="padding: 5px; " ><button class="oi oi-sort-ascending" @onclick="viewOrderByNIP">NIP</button></th>
+            <th style="padding: 5px; " >Akcje</th>
+        </tr style>
+
+    
+
+    @if (customers != null)
+    {
+       
+            @foreach (var customer in customers)
+            {<tr style="border: 1px solid;">
+                <td style="padding: 10px; border: 1px solid;" >@customer.Id</td>
+                <td style="padding: 10px; border: 1px solid;" >@customer.Name</td>
+                <td style="padding: 10px; border: 1px solid;" >@customer.Adress</td>
+                <td style="padding: 10px; border: 1px solid;" >@customer.NIP</td>
+                <td>
+                    
+                    <button class="btn btn-outline-info"  @onclick="() => editCustomer(customer.Id)" style="border-style:hidden;">Edytuj</button>
+                    <button class="btn btn-outline-danger" @onclick="() => deleteCustomer(customer.Id)" style="border-style:hidden;">Usuń</button>
+                    </td>
+            </tr>
+            }     
+            
+    }
+    else
+    {
+        <b>W bazie nie ma żadnych klientów!</b>
+       
+    }
+    </table>
+     
+}
+
+
+
+@code {
+
+    List<Customer> customers = new();
+    bool finishedLoading = false;
+   
+    HttpClient httpClient = new();
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        httpClient = clientFactory.CreateClient("Imag.Webapi");
+        try
+        {   
+           customers = await httpClient.GetFromJsonAsync<List<Customer>>(httpClient.BaseAddress + "api/Customers");
+            
+            if (customers != null)
+            {                
+                finishedLoading = true;
+            }
+
+        }
+        catch (Exception)
+        {
+
+            throw;
+        }
+
+        customers = customers.OrderBy(s => s.Id).ToList();
+
+    }
+
+    private void editCustomer(int CustomerId)
+    {
+        NavigationManager.NavigateTo($"/Customer/Edit/{CustomerId}", true);
+    }
+
+    private async void deleteCustomer(int CustomerId)
+    {
+        bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", $"Na pewno chcesz usunąć dane klienta {customers.Where(s=>s.Id==CustomerId).FirstOrDefault().Name}?");
+        if (confirmed)
+        {
+            await httpClient.DeleteAsync(httpClient.BaseAddress + $"api/Customers/{CustomerId}");            
+            customers = await httpClient.GetFromJsonAsync<List<Customer>>(httpClient.BaseAddress + "api/Customers");
+            StateHasChanged();
+        }
+    }
+
+    private void viewOrderById()
+    {
+        customers = customers.OrderBy(s=>s.Id).ToList();
+    }
+    private void viewOrderByName()
+    {
+        customers = customers.OrderBy(s=>s.Name).ToList();
+    }
+    private void viewOrderByAdress()
+    {
+        customers = customers.OrderBy(s=>s.Adress).ToList();
+    }
+    private void viewOrderByNIP()
+    {
+        customers = customers.OrderBy(s=>s.NIP).ToList();
+    }
+        
+
+}
+

@@ -1,0 +1,31 @@
+﻿@page "/"
+<h1>Dzień dobry!</h1>
+<br/>W tym projekcie jest interfejs który umożliwia użytkownikowi interakcję z systemem kontrahentów.
+<br/>Dane testowe zostały wygenerowane za pomocą narzędzia online. 
+<br/>Przy pierwszym uruchomieniu kontenera Imag_Demo_WebApi Entity Framework utworzy bazę wg. modelu "code first" i wprowadzi dane testowe.
+
+
+<br>
+<br/>
+
+
+
+Co nie było w zadaniu a dodatkowo bym zmienił:
+<ul>
+    <li>
+        dodatkowe pola do modelu Customer, np. kraj
+    </li>    
+    <li>
+        normalizował nip do jednego formatu - np PL 0000000000
+    </li>
+    <li>
+        dodał bym dbset Adres z polami jak kraj, kod pocztowy, miasto prefix (plac, ulica etc.), nazwa i dodał odwołanie w modelu customer
+    </li>
+    <li>
+        Rozszerzyłbym walidację o kolejne podpunkty (eg. sprawdzanie NIPu regexem, znaki specjalne), tutaj walidacja jest tylko pod ograniczenia zawarte w modelu
+    </li>
+    <li>
+        Sprawdził czy baza nie zawiera już firmy o podanym nipie, dodał index do bazy dla NIPu
+    </li>
+
+</ul>

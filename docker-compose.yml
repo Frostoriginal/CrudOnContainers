@@ -1,0 +1,38 @@
+version: '3.4'
+
+services:
+
+  imag_demo_blazor_frontend:
+    image: imag_demo_blazor_frontend
+    environment:
+     - ASPNETCORE_ENVIRONMENT=Development
+     - newuri=http://host.docker.internal:7142/ 
+    build:
+     context: imag_demo_blazor_frontend
+     dockerfile: Dockerfile
+    
+    ports:
+      - "80:80"
+    depends_on:
+    - imag_demo_webapi 
+    
+  imag_demo_webapi:
+    image: imag_demo_webapi
+    environment:
+     - ASPNETCORE_ENVIRONMENT=Development
+     - connstring=Data Source = host.docker.internal,1433; User iD = sa; Password=Pass@word; Initial Catalog = ImagDB; TrustServerCertificate=True;
+    build:
+      context: imag_demo_webapi
+      dockerfile: Dockerfile
+    ports: 
+      - "7142:80" 
+    depends_on:       
+    - sqldata
+
+  sqldata:
+    image: mcr.microsoft.com/mssql/server:latest
+    environment:
+      - SA_PASSWORD=Pass@word
+      - ACCEPT_EULA=Y
+    ports:
+      - "1433:1433"

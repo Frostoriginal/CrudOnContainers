@@ -1,0 +1,95 @@
+﻿@using Imag.Demo.Shared;
+@inject IHttpClientFactory clientFactory
+@inject NavigationManager NavigationManager
+@inject IConfiguration config
+@inject IJSRuntime JavaScript
+@page "/Customer/Add"
+
+<h1>Dodaj nowego klienta:</h1>
+<EditForm Model="@NewCustomer" OnValidSubmit="AddNewCustomer">
+    <DataAnnotationsValidator />
+<h5>Nazwa: </h5>
+<input type="text" class="form-control" @bind-value="@NewCustomer.Name" placeholder="Tu wpisz nazwę klienta" />
+    @if (@validChecker == true && NewCustomer.Name == "")
+    {
+        <h5 style="color: red;">Pole nie może być puste</h5>
+    }
+    @if (@validChecker == true && NewCustomer.Name.Length < 1)
+    {
+        <h5 style="color: red;">Nazwa musi zawierać minimum 1 znak</h5>
+    }
+    @if (@validChecker == true && NewCustomer.Name.Length > 50)
+    {
+        <h5 style="color: red;">Nazwa nie może być dłuższa niż 50 znaków</h5>
+    }
+    
+<br />
+<h5>Adres:</h5>
+<input type="text" class="form-control" @bind-value="@NewCustomer.Adress" placeholder="Tu wpisz adres klienta" />
+    @if (@validChecker == true && NewCustomer.Adress == "")
+    {
+        <h5 style="color: red;">Pole nie może być puste</h5>
+    }
+    @if (@validChecker == true && NewCustomer.Adress.Length < 1)
+    {
+        <h5 style="color: red;">Adres musi zawierać minimum 1 znak</h5>
+    }
+    @if (@validChecker == true && NewCustomer.Adress.Length > 50)
+    {
+        <h5 style="color: red;">Adres nie może być dłuższy niż 50 znaków</h5>
+    }
+<br />
+<h5>NIP:</h5>
+<input type="text" class="form-control" @bind-value="@NewCustomer.NIP" placeholder="Tu wpisz NIP klienta" />
+    @if (@validChecker == true && NewCustomer.NIP == "")
+    {
+        isValid = false;
+        <h5 style="color: red;">Pole nie może być puste</h5>
+    }
+    @if (@validChecker == true && NewCustomer.NIP.Length != 10)
+    {
+        isValid = false;
+        <h5 style="color: red;">NIP składa się z 10 cyfr, wpisz je bez rozdzielania</h5>
+    }
+    @if (@validChecker == true && !NewCustomer.NIP.All(char.IsDigit))
+    {
+        isValid = false;
+        <h5 style="color: red;">NIP może zawierać tylko cyfry</h5>
+    }
+<br />
+<button class="btn btn-info" type="submit" @onclick="checkerSwitch">Dodaj klienta</button>
+</EditForm>
+
+@code {
+    HttpClient httpClient = new();
+    public Customer NewCustomer { get; set; } = new Customer() { Name = "", Adress = "", NIP = ""};
+
+    private bool validChecker = false;
+    private bool isValid = true;
+
+    private void checkerSwitch()
+    {
+        validChecker = true;
+        isValid = true;
+
+    }
+       
+
+    private void getBack()
+    {
+        NavigationManager.NavigateTo("/Customers/CustomersView/", true);
+    }
+
+    private async Task AddNewCustomer()
+    {
+        if(isValid)
+        {
+        httpClient = clientFactory.CreateClient("Imag.Webapi");
+        await httpClient.PostAsJsonAsync(httpClient.BaseAddress + "api/Customers", NewCustomer);
+        NavigationManager.NavigateTo("/Customers/CustomersView", true);
+        }
+        
+    }
+       
+
+}

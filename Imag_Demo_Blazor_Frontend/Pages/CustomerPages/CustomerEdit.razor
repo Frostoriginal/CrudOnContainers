@@ -1,0 +1,125 @@
+﻿
+@using Imag.Demo.Shared;
+@inject NavigationManager NavigationManager
+@inject IConfiguration config
+@inject IHttpClientFactory clientFactory;
+@page "/Customer/Edit/{Id:int}"
+
+
+
+<PageTitle>Edytuj</PageTitle>
+
+<hr/>
+<b>Edytujesz użytkownika: @customer.Name</b>
+<br />
+<b>Aktualne dane</b>
+<br />
+<b>Nazwa: @customer.Name</b>
+<br />
+<b>Adres: @customer.Adress</b>
+<br />
+<b>NIP: @customer.NIP</b>
+<br />
+<br />
+<b>Nowe dane:</b>
+
+<EditForm Model="@customer" OnValidSubmit="UpdateCustomerById">
+    <DataAnnotationsValidator />
+    <input type="text" class="form-control" @bind-value="@customer.Name" placeholder="@customer.Name" />
+    @if (@validChecker == true && customer.Name == "")
+    {
+        <h5 style="color: red;">Pole nie może być puste</h5>
+    }
+    @if (@validChecker == true && customer.Name.Length < 1)
+    {
+        <h5 style="color: red;">Nazwa musi zawierać minimum 1 znak</h5>
+    }
+    @if (@validChecker == true && customer.Name.Length > 50)
+    {
+        <h5 style="color: red;">Nazwa nie może być dłuższa niż 50 znaków</h5>
+    }
+
+
+
+    <input type="text" class="form-control" @bind-value="@customer.Adress" placeholder="@customer.Adress" />
+
+    @if (@validChecker == true && customer.Adress == "")
+    {
+        <h5 style="color: red;">Pole nie może być puste</h5>
+    }
+    @if (@validChecker == true && customer.Adress.Length < 1)
+    {
+        <h5 style="color: red;">Adres musi zawierać minimum 1 znak</h5>
+    }
+    @if (@validChecker == true && customer.Adress.Length > 50)
+    {
+        <h5 style="color: red;">Adres nie może być dłuższy niż 50 znaków</h5>
+    }
+    <input type="text" class="form-control" @bind-value="@customer.NIP" placeholder="@customer.NIP" />
+
+
+    <button class="btn btn-info" type="submit" @onclick="checkerSwitch">Zaktualizuj</button>
+
+    @if (@validChecker == true && customer.NIP == "")
+    {
+        isValid = false;
+        <h5 style="color: red;">Pole nie może być puste</h5>
+    }
+    @if (@validChecker == true && customer.NIP.Length != 10)
+    {
+        isValid = false;
+        <h5 style="color: red;">NIP składa się z 10 cyfr, wpisz je bez rozdzielania</h5>
+    }
+    @if (@validChecker == true && !customer.NIP.All(char.IsDigit))
+    {
+        isValid = false;
+        <h5 style="color: red;">NIP może zawierać tylko cyfry</h5>
+    }
+
+
+</EditForm>
+
+
+
+
+@code {
+    [Parameter] public int Id { get; set; }
+
+    HttpClient httpClient = new();
+    bool invalidId = false; 
+    Customer customer = new Customer();
+   
+    private bool validChecker = false;
+
+    private bool isValid = true;
+
+    private void checkerSwitch()
+    {
+        validChecker = true;
+        isValid = true;
+
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        httpClient = clientFactory.CreateClient("Imag.Webapi");
+        try
+        {
+            customer = await httpClient.GetFromJsonAsync<Customer>(httpClient.BaseAddress + $"api/Customers/{Id}");
+        }
+        catch (Exception ex)
+        {
+            invalidId = true;
+            Console.Error.WriteLine(ex);
+        }
+    }
+    
+    private async Task UpdateCustomerById()
+    {   if(isValid)
+        {     
+        await httpClient.PutAsJsonAsync(httpClient.BaseAddress + $"api/customers/{Id}", customer);
+        NavigationManager.NavigateTo("/Customers/CustomersView/", true);
+        }
+    }      
+
+}
