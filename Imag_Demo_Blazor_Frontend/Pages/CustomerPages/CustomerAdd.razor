@@ -5,6 +5,8 @@
 @inject IJSRuntime JavaScript
 @page "/Customer/Add"
 
+@*Customer add form*@
+
 <h1>Dodaj nowego klienta:</h1>
 <EditForm Model="@NewCustomer" OnValidSubmit="AddNewCustomer">
     <DataAnnotationsValidator />

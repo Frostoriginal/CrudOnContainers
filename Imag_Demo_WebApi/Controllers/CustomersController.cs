@@ -1,14 +1,4 @@
-﻿// TODO:
-//- Dodawanie nowych kontrahentów.
-//-Pobieranie listy wszystkich kontrahentów.
-//- Aktualizację danych istniejących kontrahentów.
-//- Usuwanie kontrahentów.
-
-
-
-
-
-using Microsoft.AspNetCore.Mvc; // [Route], [ApiController], ControllerBase
+﻿using Microsoft.AspNetCore.Mvc; // [Route], [ApiController], ControllerBase
 using Imag.Demo.Shared; // Customer
 using Imag_Demo.WebApi.Repositories; // ICustomerRepository
 

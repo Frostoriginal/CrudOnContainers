@@ -6,11 +6,12 @@ using Swashbuckle.AspNetCore.SwaggerUI; // SubmitMethod
 using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.EntityFrameworkCore; // HttpLoggingFields
 
-//database creation & seeding for demo putposes
+//database creation & seeding for demo purposes
 
 string connString = Environment.GetEnvironmentVariable("connstring");
 using (var ctx = new ImagDataContext(connString))
 {
+    //try until database is online and connection is established 
     bool canConnect = false;
     while (canConnect == false)
     {
@@ -24,11 +25,8 @@ using (var ctx = new ImagDataContext(connString))
             throw;
         }
 
-
         if (ctx.Database.CanConnect()) canConnect = true;
-
     }
-
 
     //check to not duplicate data
     if (ctx.Customers.Count() == 0)
@@ -40,9 +38,6 @@ using (var ctx = new ImagDataContext(connString))
         ctx.Customers.Add(new Customer() { Name = "Morzytagaty Paka s.c.", Adress = "Sabinówek", NIP = "6486911880", });
         ctx.SaveChanges();
     } 
-    
-
-    
 }
 
 var builder = WebApplication.CreateBuilder(args);
@@ -53,27 +48,7 @@ builder.Services.AddDbContext<ImagDataContext>(options =>
     options.UseSqlServer(connString);    
 });
 
-//builder.Services.AddControllers();
-builder.Services.AddControllers(options =>
-{
-    Console.WriteLine("Default output formatters:");
-    foreach (IOutputFormatter formatter in options.OutputFormatters)
-    {
-        OutputFormatter? mediaFormatter = formatter as OutputFormatter;
-        if (mediaFormatter is null)
-        {
-            Console.WriteLine($" {formatter.GetType().Name}");
-        }
-        else // OutputFormatter class has SupportedMediaTypes
-        {
-            Console.WriteLine(" {0}, Media types: {1}",
-            arg0: mediaFormatter.GetType().Name,
-            arg1: string.Join(", ", mediaFormatter.SupportedMediaTypes));
-        }
-    }
-})
-.AddXmlDataContractSerializerFormatters()
-.AddXmlSerializerFormatters();
+builder.Services.AddControllers();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -90,8 +65,6 @@ builder.Services.AddHealthChecks()
   .AddDbContextCheck<ImagDataContext>()
   // execute SELECT 1 using the specified connection string 
   .AddSqlServer(connString);
-
-
 
 
 var app = builder.Build();
@@ -120,7 +93,6 @@ app.UseAuthorization();
 app.UseHealthChecks(path: "/howdoyoufeel");
 
 //app.UseMiddleware<SecurityHeaders>();
-
 
 app.MapControllers();
 

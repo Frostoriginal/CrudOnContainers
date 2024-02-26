@@ -1,10 +1,10 @@
-﻿@page "/Customers/CustomersView/"
-
-@using Imag.Demo.Shared;
-
+﻿@using Imag.Demo.Shared;
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JsRuntime
 @inject IHttpClientFactory clientFactory
+@page "/Customers/CustomersView/"
+
+@*Customer view*@
 
 
 @if (!finishedLoading) @*Check if data is loaded properly*@
@@ -64,6 +64,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        //Create httpclient and load customer data
         httpClient = clientFactory.CreateClient("Imag.Webapi");
         try
         {   

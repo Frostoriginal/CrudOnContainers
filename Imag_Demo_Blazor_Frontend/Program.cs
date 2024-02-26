@@ -14,6 +14,7 @@ namespace Imag_Demo_Blazor_Frontend
             // Add services to the container.
             builder.Services.AddRazorPages();
             builder.Services.AddServerSideBlazor();
+            //Custom http client to handle enviroment change
             builder.Services.AddHttpClient(name: "Imag.Webapi",
              configureClient: options =>
              {

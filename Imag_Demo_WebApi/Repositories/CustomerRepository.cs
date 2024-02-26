@@ -16,7 +16,7 @@ public class CustomerRepository :ICustomerRepository
     public CustomerRepository(ImagDataContext injectedContext)
     {
         db = injectedContext;
-        db.MyConnString = "Data Source = host.docker.internal,1433; User iD = sa; Password=Pass@word; Initial Catalog = ImagDB; TrustServerCertificate=True;";
+        db.MyConnString = Environment.GetEnvironmentVariable("connstring");
         // Pre-load customers from database as a normal
         // Dictionary with Customer Id as the key,
         // then convert to a thread-safe ConcurrentDictionary.
@@ -28,9 +28,7 @@ public class CustomerRepository :ICustomerRepository
     }
 
     public async Task<Customer?> CreateAsync(Customer c)
-    {
-        // Normalize CustomerId into uppercase.
-       // c.Id = c.Id.ToUpper();
+    {       
         // Add to database using EF Core.
         EntityEntry<Customer> added = await db.Customers.AddAsync(c);
         int affected = await db.SaveChangesAsync();
@@ -55,7 +53,6 @@ public class CustomerRepository :ICustomerRepository
     public Task<Customer?> RetrieveAsync(string id)
     {
         // For performance, get from cache.
-        //id = id.ToUpper();
         if (customersCache is null) return null!;
         customersCache.TryGetValue(id, out Customer? c);
         return Task.FromResult(c);
@@ -81,10 +78,7 @@ public class CustomerRepository :ICustomerRepository
 
 
     public async Task<Customer?> UpdateAsync(string id, Customer c)
-    {
-        // Normalize customer Id.
-       // id = id.ToUpper();
-       // c.Id = c.Id.ToUpper();
+    {        
         // Update in database.
         db.Customers.Update(c);
         int affected = await db.SaveChangesAsync();
@@ -97,7 +91,6 @@ public class CustomerRepository :ICustomerRepository
     }
     public async Task<bool?> DeleteAsync(string id)
     {
-        //id = id.ToUpper();
         // Remove from database.
         int customerId = int.Parse(id);
         Customer? c = db.Customers.Find(customerId);
