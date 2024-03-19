@@ -1,0 +1,5 @@
+﻿docker run -e 'ACCEPT_EULA=Y' -e 'SA_PASSWORD=Pass@word' -p 1433:1433 -d mcr.microsoft.com/mssql/server:2017-latest
+Correct
+
+docker run -d -p 8080:80 imag_webapi -e connstring = 'Data Source = host.docker.internal,1433; User iD = sa; Password=Pass@word; Initial Catalog = ImagDB; TrustServerCertificate=True;' -e ASPNETCORE_ENVIRONMENT='Development'
+wrong env, run from imag_Demo dir, setup proper ports
